@@ -30,22 +30,33 @@ PROMPT_DICT = {
 
 @dataclass
 class ModelArguments:
-    model_name_or_path: Optional[str] = field(default="decapoda-research/llama-7b-hf")
+    model_name_or_path: Optional[str] = field(default="baffo32/decapoda-research-llama-7B-hf")
 
 
 @dataclass
 class DataArguments:
-    data_path: str = field(default=None, metadata={"help": "Path to the data."})
+    train_data_path: str = field(default=None, metadata={"help": "Path to the train data."})
+    eval_data_path: str = field(default=None, metadata={"help": "Path to the eval data."})
 
 
 @dataclass
 class TrainingArguments(transformers.TrainingArguments):
-    cache_dir: Optional[str] = field(default=None)
-    optim: str = field(default="adamw_torch")
+
+    learning_rate: float = field(default=2e-5, metadata={"help": "The initial learning rate for AdamW."})
+    num_train_epochs: float = field(default=3.0, metadata={"help": "Total number of training epochs to perform."})
+    weight_decay: float = field(default=0.0, metadata={"help": "Weight decay for AdamW if we apply some."})
+    per_device_train_batch_size: int = field(
+        default=128, metadata={"help": "Batch size per GPU/TPU/MPS/NPU core/CPU for training."}
+    )
+    per_device_eval_batch_size: int = field(
+        default=128, metadata={"help": "Batch size per GPU/TPU/MPS/NPU core/CPU for evaluation."}
+    )
     model_max_length: int = field(
         default=512,
         metadata={"help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."},
     )
+    cache_dir: Optional[str] = field(default=None)
+    optim: str = field(default="adamw_torch")
     output_dir: Optional[str] = "model"
 
 
@@ -161,6 +172,7 @@ class DataCollatorForSupervisedDataset(object):
 
 def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, data_args) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
-    dataset = SupervisedDataset(tokenizer=tokenizer, data_path=data_args.data_path)
+    train_dataset = SupervisedDataset(tokenizer=tokenizer, data_path=data_args.train_data_path)
+    eval_dataset = SupervisedDataset(tokenizer=tokenizer, data_path=data_args.eval_data_path)
     data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
-    return dict(train_dataset=dataset, eval_dataset=dataset, data_collator=data_collator)
+    return dict(train_dataset=train_dataset, eval_dataset=eval_dataset, data_collator=data_collator)

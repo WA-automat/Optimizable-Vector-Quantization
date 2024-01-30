@@ -3,10 +3,12 @@ from transformers import Trainer
 
 from ovq.utils.Dataset import ModelArguments, DataArguments, TrainingArguments, DEFAULT_PAD_TOKEN, DEFAULT_EOS_TOKEN, \
     DEFAULT_BOS_TOKEN, DEFAULT_UNK_TOKEN, smart_tokenizer_and_embedding_resize, make_supervised_data_module
+from ovq.utils.metric import compute_metrics
 
 
 def train():
-    DataArguments.data_path = "./data/alpaca_data.json"
+    DataArguments.train_data_path = "./data/alpaca_data.json"
+    DataArguments.eval_data_path = "./data/alpaca_data.json"
 
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
@@ -40,7 +42,8 @@ def train():
     )
 
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
-    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
+    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, compute_metrics=compute_metrics,
+                      **data_module)
     trainer.train()
     trainer.save_state()
     trainer.save_model(output_dir=training_args.output_dir)

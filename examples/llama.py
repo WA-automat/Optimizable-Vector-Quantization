@@ -4,22 +4,23 @@ from transformers import Trainer
 
 from ovq.utils.Dataset import DEFAULT_PAD_TOKEN, DEFAULT_EOS_TOKEN, DEFAULT_BOS_TOKEN, DEFAULT_UNK_TOKEN, \
     smart_tokenizer_and_embedding_resize, make_supervised_data_module, ModelArguments, DataArguments, TrainingArguments
+from ovq.utils.metric import compute_metrics
 
+if __name__ == '__main__':
 
-@pytest.mark.test_LLama
-def test_llama():
-    DataArguments.data_path = "./data/alpaca_data.json"
+    DataArguments.train_data_path = "./data/alpaca_data.json"
+    DataArguments.eval_data_path = "./data/alpaca_data.json"
 
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     model = transformers.AutoModelForCausalLM.from_pretrained(
-        "decapoda-research/llama-7b-hf",
+        "baffo32/decapoda-research-llama-7B-hf",
         cache_dir=training_args.cache_dir
     )
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(
-        "decapoda-research/llama-7b-hf",
+        "baffo32/decapoda-research-llama-7B-hf",
         cache_dir=training_args.cache_dir,
         model_max_length=training_args.model_max_length,
         padding_side="right",
@@ -43,7 +44,8 @@ def test_llama():
     )
 
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
-    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
+    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, compute_metrics=compute_metrics,
+                      **data_module)
     trainer.train()
     trainer.evaluate()
     trainer.save_state()
