@@ -7,8 +7,8 @@ from ovq.utils.metric import compute_metrics
 
 
 def train():
-    DataArguments.train_data_path = "./data/alpaca_data.json"
-    DataArguments.eval_data_path = "./data/alpaca_data.json"
+    DataArguments.train_data_path = "./data/train_data.json"
+    DataArguments.eval_data_path = "./data/eval_data.json"
 
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()

@@ -1,4 +1,3 @@
-import pytest
 import transformers
 from transformers import Trainer
 
@@ -7,9 +6,8 @@ from ovq.utils.Dataset import DEFAULT_PAD_TOKEN, DEFAULT_EOS_TOKEN, DEFAULT_BOS_
 from ovq.utils.metric import compute_metrics
 
 if __name__ == '__main__':
-
-    DataArguments.train_data_path = "./data/alpaca_data.json"
-    DataArguments.eval_data_path = "./data/alpaca_data.json"
+    DataArguments.train_data_path = "./data/train_data.json"
+    DataArguments.eval_data_path = "./data/eval_data.json"
 
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()

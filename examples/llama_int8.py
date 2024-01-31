@@ -1,6 +1,5 @@
 import accelerate
 import bitsandbytes as bnb
-import torch
 import transformers
 from transformers import Trainer, AutoTokenizer, AutoModelForCausalLM
 
@@ -9,8 +8,8 @@ from ovq.utils.Dataset import DEFAULT_PAD_TOKEN, DEFAULT_EOS_TOKEN, DEFAULT_BOS_
 from ovq.utils.metric import compute_metrics
 
 if __name__ == '__main__':
-
-    DataArguments.data_path = "./data/alpaca_data.json"
+    DataArguments.train_data_path = "./data/train_data.json"
+    DataArguments.eval_data_path = "./data/eval_data.json"
 
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
@@ -20,7 +19,7 @@ if __name__ == '__main__':
     # max_memory = {i: max_memory for i in range(n_gpus)}
 
     # 使用封装好的 LLM.int8 加载模型
-    model = transformers.AutoModelForCausalLM.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         "baffo32/decapoda-research-llama-7B-hf",
         cache_dir=training_args.cache_dir,
         device_map='auto',
@@ -28,7 +27,7 @@ if __name__ == '__main__':
         # max_memory=max_memory
     )
 
-    tokenizer = transformers.AutoTokenizer.from_pretrained(
+    tokenizer = AutoTokenizer.from_pretrained(
         "baffo32/decapoda-research-llama-7B-hf",
         cache_dir=training_args.cache_dir,
         model_max_length=training_args.model_max_length,
