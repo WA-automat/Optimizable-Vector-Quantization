@@ -3,6 +3,8 @@ import torch.nn as nn
 from torch import Tensor
 import torch.nn.functional as F
 
+from ovq.autograd.functional import Quantize
+
 
 class LinearWithOV(nn.Linear):
     """
@@ -15,17 +17,15 @@ class LinearWithOV(nn.Linear):
 
     def forward(self, x: Tensor) -> Tensor:
         ov = F.gumbel_softmax(self.ov, tau=1.0, hard=True)
-        print(ov[:, 1])
-
-        # 拆分矩阵
-
-        # 对输入进行量化
-
-        # 对权重进行量化
-
-        # 计算结果并进行反量化
+        x = Quantize.apply(x, ov[:, 1])  # 对输入进行伪量化
+        w = Quantize.apply(self.weight, ov[:, 1])  # 对权重进行伪量化
+        y = x @ w.t()
 
         # 若包含偏置，计算包含偏置的结果
+        if self.bias is not None:
+            y += self.bias
+
+        return y
 
     def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
                               missing_keys, unexpected_keys, error_msgs):

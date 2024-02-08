@@ -3,8 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from ovq.autograd.functional import quantize_per_channel_with_indices, dequantize_tensor_per_channel_with_indices, \
-    Quantize
+from ovq.autograd.functional import Quantize
 
 if __name__ == '__main__':
     ov = nn.Parameter(torch.randn(8, 2), requires_grad=True)

@@ -28,7 +28,7 @@ class Quantize(Function):
     def forward(ctx, x, indices):
         ctx.save_for_backward(x, indices)
         x_q, scale = quantize_per_channel_with_indices(x, indices)
-        x_dq = dequantize_tensor_per_channel_with_indices(x, indices, scale)
+        x_dq = dequantize_tensor_per_channel_with_indices(x_q, indices, scale)
         return x_dq
 
     @staticmethod
