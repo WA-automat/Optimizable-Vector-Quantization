@@ -44,7 +44,14 @@ def train():
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
     trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, compute_metrics=compute_metrics,
                       **data_module)
+
+    # TODO: 将模型的线性层替换为带有可优化向量的线性层
+
     trainer.train()
+
+    # TODO: 将线性层参数锁定
+
+    trainer.evaluate()
     trainer.save_state()
     trainer.save_model(output_dir=training_args.output_dir)
 

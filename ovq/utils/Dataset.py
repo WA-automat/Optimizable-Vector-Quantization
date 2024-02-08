@@ -35,8 +35,8 @@ class ModelArguments:
 
 @dataclass
 class DataArguments:
-    train_data_path: str = field(default=None, metadata={"help": "Path to the train data."})
-    eval_data_path: str = field(default=None, metadata={"help": "Path to the eval data."})
+    train_data_path: str = field(default="../data/train_data.json", metadata={"help": "Path to the train data."})
+    eval_data_path: str = field(default="../data/eval_data.json", metadata={"help": "Path to the eval data."})
 
 
 @dataclass

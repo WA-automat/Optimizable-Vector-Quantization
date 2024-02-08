@@ -1,9 +1,11 @@
 import transformers
 from transformers import Trainer
 
+from ovq.nn.modules import LinearWithOV
 from ovq.utils.Dataset import DEFAULT_PAD_TOKEN, DEFAULT_EOS_TOKEN, DEFAULT_BOS_TOKEN, DEFAULT_UNK_TOKEN, \
     smart_tokenizer_and_embedding_resize, make_supervised_data_module, ModelArguments, DataArguments, TrainingArguments
 from ovq.utils.metric import compute_metrics
+from ovq.utils.transition import replace_linear
 
 if __name__ == '__main__':
     DataArguments.train_data_path = "./data/train_data.json"
@@ -13,12 +15,12 @@ if __name__ == '__main__':
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     model = transformers.AutoModelForCausalLM.from_pretrained(
-        "baffo32/decapoda-research-llama-7B-hf",
+        "../model/decapoda-research-llama-7B-hf",
         cache_dir=training_args.cache_dir
     )
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(
-        "baffo32/decapoda-research-llama-7B-hf",
+        "../model/decapoda-research-llama-7B-hf",
         cache_dir=training_args.cache_dir,
         model_max_length=training_args.model_max_length,
         padding_side="right",
@@ -42,9 +44,10 @@ if __name__ == '__main__':
     )
 
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
-    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, compute_metrics=compute_metrics,
+    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args,
+                      compute_metrics=compute_metrics,
                       **data_module)
-    trainer.train()
+    # trainer.train()
     trainer.evaluate()
     trainer.save_state()
     trainer.save_model()

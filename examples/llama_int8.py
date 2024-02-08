@@ -1,5 +1,3 @@
-import accelerate
-import bitsandbytes as bnb
 import transformers
 from transformers import Trainer, AutoTokenizer, AutoModelForCausalLM
 
@@ -20,7 +18,7 @@ if __name__ == '__main__':
 
     # 使用封装好的 LLM.int8 加载模型
     model = AutoModelForCausalLM.from_pretrained(
-        "baffo32/decapoda-research-llama-7B-hf",
+        "../model/decapoda-research-llama-7B-hf",
         cache_dir=training_args.cache_dir,
         device_map='auto',
         load_in_8bit=True,
@@ -28,7 +26,7 @@ if __name__ == '__main__':
     )
 
     tokenizer = AutoTokenizer.from_pretrained(
-        "baffo32/decapoda-research-llama-7B-hf",
+        "../model/decapoda-research-llama-7B-hf",
         cache_dir=training_args.cache_dir,
         model_max_length=training_args.model_max_length,
         padding_side="right",
@@ -52,9 +50,10 @@ if __name__ == '__main__':
     )
 
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
-    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, compute_metrics=compute_metrics,
-                      **data_module)
-    trainer.train()
-    trainer.evaluate()
-    trainer.save_state()
-    trainer.save_model()
+    # trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args,
+    #                   compute_metrics=compute_metrics,
+    #                   **data_module)
+    # trainer.train()
+    # trainer.evaluate()
+    # trainer.save_state()
+    # trainer.save_model()
