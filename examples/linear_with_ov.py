@@ -41,8 +41,8 @@ if __name__ == '__main__':
 
     # 创建模型
     # module = LinearModel()
-    module = LinearWithOV(1, 1)
-    # module = MLPWithOV(1, 1)
+    # module = LinearWithOV(1, 1)
+    module = MLPWithOV(1, 1)
 
     # 定义损失函数和优化器
     criterion = nn.MSELoss()
@@ -72,11 +72,11 @@ if __name__ == '__main__':
     print(module(inputs))
 
     # 量化
-    # module.l1.quantize()
-    # module.l2.quantize()
-    # module.l3.quantize()
-    # module.l4.quantize()
-    module.quantize()
+    module.l1.quantize()
+    module.l2.quantize()
+    module.l3.quantize()
+    module.l4.quantize()
+    # module.quantize()
 
     # 推理
     start = time.time()
@@ -84,4 +84,4 @@ if __name__ == '__main__':
     end = time.time()
     print(end - start)
 
-    print(module.state_dict())
+    torch.save(module.state_dict(), "../model/test.pt")
