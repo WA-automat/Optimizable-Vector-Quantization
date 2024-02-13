@@ -1,5 +1,7 @@
 import torch
 
+from ovq.nn.modules import LinearWithOV
+
 
 def replace_linear(model, linear_replacement, skip_modules=["lm_head"], copy_weights=False,
                    post_processing_function=None):
@@ -36,5 +38,21 @@ def replace_linear(model, linear_replacement, skip_modules=["lm_head"], copy_wei
 
             if post_processing_function is not None:
                 func = getattr(module, post_processing_function, None)
-                if func is not None: func(module)
+                if func is not None:
+                    func(module)
+    return model
+
+
+def quantize_linear(model, skip_modules=["lm_head"]):
+    """
+    将模型的线性层量化
+    :param model: 模型
+    :param skip_modules: 跳过的层
+    :return:
+    """
+    for name, module in model.named_children():
+        if len(list(module.children())) > 0:
+            quantize_linear(module)
+        if isinstance(module, LinearWithOV) and name not in skip_modules:
+            module.quantize()
     return model
