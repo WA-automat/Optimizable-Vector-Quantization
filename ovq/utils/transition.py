@@ -4,7 +4,7 @@ from ovq.nn.modules import LinearWithOV
 
 
 def replace_linear(model, linear_replacement, skip_modules=["lm_head"], copy_weights=False,
-                   post_processing_function=None):
+                   post_processing_function=None, dtype=torch.float32):
     """
     Replace linear modules with a new Linear module.
     Parameters:
@@ -31,10 +31,11 @@ def replace_linear(model, linear_replacement, skip_modules=["lm_head"], copy_wei
                 module.in_features,
                 module.out_features,
                 module.bias is not None,
+                dtype=dtype
             )
             if copy_weights:
-                model._modules[name].weight = old_module.weight
-                model._modules[name].bias = old_module.bias
+                model._modules[name].weight = old_module.weight.to(dtype)
+                model._modules[name].bias = old_module.bias.to(dtype)
 
             if post_processing_function is not None:
                 func = getattr(module, post_processing_function, None)

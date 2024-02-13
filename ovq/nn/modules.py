@@ -11,12 +11,14 @@ class LinearWithOV(nn.Linear):
     带有可优化向量的线性层
     """
 
-    def __init__(self, in_features, out_features, bias=True, device=None):
-        super(LinearWithOV, self).__init__(in_features, out_features, bias, device)
+    def __init__(self, in_features, out_features, bias=True, device=None, dtype=torch.float32):
+        super(LinearWithOV, self).__init__(in_features, out_features, bias, device, dtype)
         self.ov = nn.Parameter(torch.randn(in_features, 2), requires_grad=True)
         self.lock = False
+        self.dtype = dtype
 
     def forward(self, x: Tensor) -> Tensor:
+        x = x.to(self.dtype)
         if not self.lock:
             # 若为微调：进行伪量化
             ov = F.gumbel_softmax(self.ov, tau=1.0, hard=True)
@@ -38,7 +40,7 @@ class LinearWithOV(nn.Linear):
             # 处理计算结果
             s = torch.outer(sx, self.sw)
             y = uqx @ self.uqw.t()
-            y += ((qx @ self.qw.t().to(torch.int32)).to(torch.float32) / (127 * 127)) * s
+            y += ((qx @ self.qw.t().to(torch.int32)).to(self.dtype) / (127 * 127)) * s
             if self.bias is not None:
                 y += self.bias
             return y

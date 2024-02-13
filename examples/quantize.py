@@ -20,6 +20,7 @@ if __name__ == '__main__':
     loss = torch.sum(dqx)  # 使用一个损失函数来定义梯度
     loss.backward()
     optimizer.step()
+
     # 输出梯度
     print(ov.grad)
     print(x.grad)
