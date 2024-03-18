@@ -24,7 +24,7 @@ class MLPWithOV(nn.Module):
 
 
 if __name__ == '__main__':
-    inputs = torch.tensor([[1], [2], [3], [4]], dtype=torch.float32)
+    inputs = torch.tensor([[4], [6], [7], [8]], dtype=torch.float32)
     module = MLPWithOV(1, 1)
     state_dict = torch.load("../model/test.pt")
     print(state_dict)

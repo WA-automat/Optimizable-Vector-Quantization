@@ -13,7 +13,9 @@ class LinearWithOV(nn.Linear):
 
     def __init__(self, in_features, out_features, bias=True, device=None, dtype=torch.float32):
         super(LinearWithOV, self).__init__(in_features, out_features, bias, device, dtype)
-        self.ov = nn.Parameter(torch.randn(in_features, 2), requires_grad=True)
+        self.ov = nn.Parameter(
+            torch.cat([torch.zeros(in_features, 1), torch.ones(in_features, 1)], dim=1),
+            requires_grad=True)
         self.lock = False
         self.dtype = dtype
 
@@ -33,9 +35,8 @@ class LinearWithOV(nn.Linear):
         else:
             # 若为推理：首先进行量化输入
             quantize_x, sx = quantize_per_channel_with_indices(x, self.v)
-            qx = quantize_x[:, (self.v == 1)]
+            qx = quantize_x[:, (self.v == 1)].to(torch.int32)
             uqx = quantize_x[:, (self.v == 0)]
-            qx = qx.to(torch.int32)
 
             # 处理计算结果
             s = torch.outer(sx, self.sw)

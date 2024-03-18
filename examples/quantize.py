@@ -6,6 +6,7 @@ import torch.optim as optim
 from ovq.autograd.functional import Quantize
 
 if __name__ == '__main__':
+    print(F.gumbel_softmax(torch.cat([torch.zeros(3, 1), torch.ones(3, 1)], dim=1), tau=1.0, hard=True))
     ov = nn.Parameter(torch.randn(8, 2), requires_grad=True)
     idx = F.gumbel_softmax(ov, tau=1.0, hard=True)
     x = torch.randn((8, 8), requires_grad=True)
